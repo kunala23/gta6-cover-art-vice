@@ -1,12 +1,242 @@
-html, body { margin: 0; height: 100%; background: #f2f0f4; color: #1d1b22; font: 15px/1.4 system-ui, sans-serif; }
-.app { display: flex; gap: 32px; align-items: center; justify-content: center; height: 100%; padding: 24px; box-sizing: border-box; }
-.controls { display: flex; flex-direction: column; gap: 14px; width: 280px; }
-.controls h1 { margin: 0; font-size: 28px; }
-.controls p { margin: 0; color: #5c5866; }
-label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
-input[type=text] { font: inherit; padding: 8px; border: 1px solid #c9c4d1; border-radius: 6px; }
-button { font: inherit; font-weight: 700; padding: 10px; border: 0; border-radius: 6px; background: #1d1b22; color: #fff; cursor: pointer; }
-canvas { width: min(70vh, 60vw); height: min(70vh, 60vw); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); }
-body.shot-cover .controls { display: none; }
-body.shot-cover .app { padding: 0; }
-body.shot-cover canvas { width: 100vw; height: 100vh; box-shadow: none; }
+/* Vice Cover Maker — dark editor chrome around a bright sunset cover. */
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #0d0a14;
+  --panel: #171226;
+  --panel-edge: #2c2145;
+  --ink: #f4eefc;
+  --muted: #a99cc4;
+  --pink: #ff2e88;
+  --orange: #ff9a3d;
+  --cyan: #2de2ff;
+  --gold: #ffd166;
+}
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--panel-edge);
+  background: linear-gradient(90deg, #1b1030, #2a0f2e 55%, #160f2a);
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 19px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--pink), var(--orange) 60%, var(--gold));
+  border-radius: 10px;
+  transform: rotate(-4deg);
+  box-shadow: 0 4px 18px rgba(255, 46, 136, 0.45);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: 0.5px;
+  font-style: italic;
+  text-transform: uppercase;
+}
+
+.tagline { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.privacy {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--cyan);
+  border: 1px solid rgba(45, 226, 255, 0.35);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 20px 28px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 14px;
+  padding: 6px 16px 16px;
+  position: sticky;
+  top: 14px;
+}
+
+.group { border-bottom: 1px solid var(--panel-edge); padding: 14px 0; }
+.group:last-child { border-bottom: 0; }
+
+.group h2 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.group label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.group input[type="text"],
+.group select {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-edge);
+  background: #0f0b1c;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.group input[type="range"] { display: block; width: 100%; margin-top: 6px; accent-color: var(--pink); }
+
+.hint { font-size: 12.5px; color: var(--muted); margin: 8px 0; line-height: 1.45; }
+
+.file-btn {
+  display: inline-block;
+  cursor: pointer;
+  background: var(--pink);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  margin-right: 8px;
+}
+.group label.file-btn { color: #fff; }
+.file-btn input { display: none; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.ghost {
+  background: #241a3d;
+  color: var(--ink);
+  border: 1px solid var(--panel-edge);
+  margin: 4px 4px 4px 0;
+}
+
+.primary {
+  width: 100%;
+  background: linear-gradient(90deg, var(--pink), var(--orange));
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.4px;
+  padding: 12px;
+  box-shadow: 0 6px 20px rgba(255, 46, 136, 0.35);
+}
+
+.choices { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.choice {
+  background: #241a3d;
+  color: var(--ink);
+  border: 1px solid var(--panel-edge);
+  padding: 8px 11px;
+  font-size: 13px;
+}
+
+.choice.active {
+  background: linear-gradient(90deg, var(--pink), #b537f2);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.strip:empty { display: none; }
+
+.strip img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.strip img.picked { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(45, 226, 255, 0.35); }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.status { font-size: 13px; color: var(--cyan); min-height: 18px; margin: 10px 0 0; }
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.stage canvas {
+  max-width: min(100%, 760px);
+  max-height: calc(100vh - 150px);
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  touch-action: none;
+  background: #1a0f2e;
+}
+
+.stage canvas:active { cursor: grabbing; }
+
+.stage-hint { color: var(--muted); font-size: 12.5px; margin: 0; text-align: center; }
+
+/* Full-frame cover mode, used for screenshot exports: hide the editor chrome. */
+body.shot .topbar,
+body.shot .panel,
+body.shot .stage-hint { display: none; }
+body.shot .workspace { display: block; padding: 0; }
+body.shot .stage { padding: 0; }
+body.shot .stage canvas {
+  max-width: none;
+  max-height: none;
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 860px) {
+  .workspace { grid-template-columns: 1fr; }
+  .panel { position: static; }
+}
